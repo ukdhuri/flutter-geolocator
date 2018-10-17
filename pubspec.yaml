@@ -8,7 +8,7 @@ dependencies:
   meta: "^1.0.5"
   flutter:
     sdk: flutter
-  permission_handler: ">=2.0.0 <3.0.0"
+  permission_handler:
     git: git@github.com:mortenboye/flutter-permission-handler.git
   google_api_availability: ">=1.0.1 <2.0.0"
 dev_dependencies:
