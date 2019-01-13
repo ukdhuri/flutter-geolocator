@@ -21,7 +21,12 @@ master  | [![Build Status](https://travis-ci.com/BaseflowIT/flutter-geolocator.s
 
 ## Usage
 
-To use this plugin, add `geolocator` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
+To use this plugin, add 
+`
+geolocator:
+   git: 'git@github.com:mortenboye/flutter-geolocator.git'
+` 
+as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
 
 ```yaml
 dependencies:
