@@ -30,7 +30,8 @@ as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/
 
 ```yaml
 dependencies:
-  geolocator: '^2.0.1'
+  geolocator:
+    git: 'git@github.com:mortenboye/flutter-geolocator.git'
 ```
 
 > **NOTE:** There's a known issue with integrating plugins that use Swift into a Flutter project created with the Objective-C template. See issue [Flutter#16049](https://github.com/flutter/flutter/issues/16049) for help on integration.
