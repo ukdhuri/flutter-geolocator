@@ -1,3 +1,26 @@
+## [3.0.0]
+
+* **breaking** Updated to support AndroidX;
+* Added API method `isLocationServiceEnabled` to check if location services are enabled or disabled
+* Removed method `checkGeolocationStatus` (marked deprecated in version 1.6.4);
+* Updated to latest version of Permission Handler plugin to solve some small issues on iOS;
+* Added Swift version number to podspec file;
+* Added ProGuard support for Android;
+* Updated static code analyses to confirm to latest recommendations from Flutter team.
+
+## [2.1.1]
+
+* Updated iOS code to Swift 4.2
+* Updated to latest version of the permission_handler plugin (v2.1.2)
+
+## [2.1.0]
+
+* Updated dependencies on Permission Handler and Google API Availability plugins.
+
+## [2.0.2]
+
+* Updated Gradle version
+
 ## [2.0.1]
 
 * Bug fix where a null reference exception occurs because the timestamp of the `Position` could be `null` when fetching a `Placemark` using the `placemarkFromAddress` or `placemarkFromCoordinates` methods.
@@ -21,7 +44,7 @@
 ## [1.6.4]
 
 * Added support to supply a locale when using the `placemarkFromAddress` and `placemarkFromCoordinates` methods.
-* Depracated the static method `checkGeolocationStatus` in favor of the instance method `checkGeolocationPermissionStatus` (the static version will be removed in version 2.0 of the Geolocator plugin).
+* Deprecated the static method `checkGeolocationStatus` in favor of the instance method `checkGeolocationPermissionStatus` (the static version will be removed in version 2.0 of the Geolocator plugin).
 
 ## [1.6.3]
 
