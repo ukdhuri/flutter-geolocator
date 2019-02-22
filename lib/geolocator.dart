@@ -19,10 +19,8 @@ part 'utils/codec.dart';
 class Geolocator {
   factory Geolocator() {
     if (_instance == null) {
-      const MethodChannel methodChannel =
-          MethodChannel('flutter.baseflow.com/geolocator/methods');
-      const EventChannel eventChannel =
-          EventChannel('flutter.baseflow.com/geolocator/events');
+      const MethodChannel methodChannel = MethodChannel('flutter.baseflow.com/geolocator/methods');
+      const EventChannel eventChannel = EventChannel('flutter.baseflow.com/geolocator/events');
       _instance = Geolocator.private(methodChannel, eventChannel);
     }
     return _instance;
@@ -39,20 +37,15 @@ class Geolocator {
   Stream<Position> _onPositionChanged;
 
   /// Returns a [Future] containing the current [GeolocationStatus] indicating the availability of location services on the device.
-  Future<GeolocationStatus> checkGeolocationPermissionStatus(
-      {GeolocationPermission locationPermission =
-          GeolocationPermission.location}) async {
-    final PermissionStatus permissionStatus = await PermissionHandler()
-        .checkPermissionStatus(
-            _GeolocationStatusConverter.toPermissionGroup(locationPermission));
+  Future<GeolocationStatus> checkGeolocationPermissionStatus({GeolocationPermission locationPermission = GeolocationPermission.location}) async {
+    final PermissionStatus permissionStatus = await PermissionHandler().checkPermissionStatus(_GeolocationStatusConverter.toPermissionGroup(locationPermission));
 
     return _GeolocationStatusConverter.fromPermissionStatus(permissionStatus);
   }
 
   /// Returns a [bool] value indicating whether location services are enabled on the device.
   Future<bool> isLocationServiceEnabled() async {
-    final ServiceStatus serviceStatus =
-        await PermissionHandler().checkServiceStatus(PermissionGroup.location);
+    final ServiceStatus serviceStatus = await PermissionHandler().checkServiceStatus(PermissionGroup.location);
 
     return serviceStatus == ServiceStatus.enabled ? true : false;
   }
@@ -71,29 +64,20 @@ class Geolocator {
       return true;
     }
 
-    _googlePlayServicesAvailability ??=
-        await GoogleApiAvailability().checkGooglePlayServicesAvailability();
+    _googlePlayServicesAvailability ??= await GoogleApiAvailability.instance.checkGooglePlayServicesAvailability();
 
-    return _googlePlayServicesAvailability !=
-        GooglePlayServicesAvailability.success;
+    return _googlePlayServicesAvailability != GooglePlayServicesAvailability.success;
   }
 
   /// Returns the current position taking the supplied [desiredAccuracy] into account.
   ///
   /// When the [desiredAccuracy] is not supplied, it defaults to best.
-  Future<Position> getCurrentPosition(
-      {LocationAccuracy desiredAccuracy = LocationAccuracy.best}) async {
+  Future<Position> getCurrentPosition({LocationAccuracy desiredAccuracy = LocationAccuracy.best}) async {
     final PermissionStatus permission = await _getLocationPermission();
 
     if (permission == PermissionStatus.granted) {
-      final LocationOptions locationOptions = LocationOptions(
-          accuracy: desiredAccuracy,
-          distanceFilter: 0,
-          forceAndroidLocationManager:
-              await _shouldForceAndroidLocationManager());
-      final Map<dynamic, dynamic> positionMap =
-          await _methodChannel.invokeMethod('getCurrentPosition',
-              Codec.encodeLocationOptions(locationOptions));
+      final LocationOptions locationOptions = LocationOptions(accuracy: desiredAccuracy, distanceFilter: 0, forceAndroidLocationManager: await _shouldForceAndroidLocationManager());
+      final Map<dynamic, dynamic> positionMap = await _methodChannel.invokeMethod('getCurrentPosition', Codec.encodeLocationOptions(locationOptions));
 
       try {
         return Position._fromMap(positionMap);
@@ -112,19 +96,12 @@ class Geolocator {
   /// On Android we look for the location provider matching best with the
   /// supplied [desiredAccuracy]. On iOS this parameter is ignored.
   /// When no position is available, null is returned.
-  Future<Position> getLastKnownPosition(
-      {LocationAccuracy desiredAccuracy = LocationAccuracy.best}) async {
+  Future<Position> getLastKnownPosition({LocationAccuracy desiredAccuracy = LocationAccuracy.best}) async {
     final PermissionStatus permission = await _getLocationPermission();
 
     if (permission == PermissionStatus.granted) {
-      final LocationOptions locationOptions = LocationOptions(
-          accuracy: desiredAccuracy,
-          distanceFilter: 0,
-          forceAndroidLocationManager:
-              await _shouldForceAndroidLocationManager());
-      final Map<dynamic, dynamic> positionMap =
-          await _methodChannel.invokeMethod('getLastKnownPosition',
-              Codec.encodeLocationOptions(locationOptions));
+      final LocationOptions locationOptions = LocationOptions(accuracy: desiredAccuracy, distanceFilter: 0, forceAndroidLocationManager: await _shouldForceAndroidLocationManager());
+      final Map<dynamic, dynamic> positionMap = await _methodChannel.invokeMethod('getLastKnownPosition', Codec.encodeLocationOptions(locationOptions));
 
       try {
         return Position._fromMap(positionMap);
@@ -157,15 +134,11 @@ class Geolocator {
   /// You can customize the behaviour of the location updates by supplying an
   /// instance [LocationOptions] class. When you don't supply any specific
   /// options, default values will be used for each setting.
-  Stream<Position> getPositionStream(
-      [LocationOptions locationOptions = const LocationOptions()]) async* {
+  Stream<Position> getPositionStream([LocationOptions locationOptions = const LocationOptions()]) async* {
     final PermissionStatus permission = await _getLocationPermission();
 
     if (permission == PermissionStatus.granted) {
-      _onPositionChanged ??= _eventChannel
-          .receiveBroadcastStream(Codec.encodeLocationOptions(locationOptions))
-          .map<Position>((dynamic element) =>
-              Position._fromMap(element.cast<String, dynamic>()));
+      _onPositionChanged ??= _eventChannel.receiveBroadcastStream(Codec.encodeLocationOptions(locationOptions)).map<Position>((dynamic element) => Position._fromMap(element.cast<String, dynamic>()));
 
       yield* _onPositionChanged;
     } else {
@@ -174,17 +147,12 @@ class Geolocator {
   }
 
   Future<PermissionStatus> _getLocationPermission() async {
-    final PermissionStatus permission = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.location);
+    final PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.location);
 
-    if (permission != PermissionStatus.granted &&
-        permission != PermissionStatus.disabled) {
-      final Map<PermissionGroup, PermissionStatus> permissionStatus =
-          await PermissionHandler()
-              .requestPermissions(<PermissionGroup>[PermissionGroup.location]);
+    if (permission != PermissionStatus.granted && permission != PermissionStatus.disabled) {
+      final Map<PermissionGroup, PermissionStatus> permissionStatus = await PermissionHandler().requestPermissions(<PermissionGroup>[PermissionGroup.location]);
 
-      return permissionStatus[PermissionGroup.location] ??
-          PermissionStatus.unknown;
+      return permissionStatus[PermissionGroup.location] ?? PermissionStatus.unknown;
     } else {
       return permission;
     }
@@ -192,15 +160,9 @@ class Geolocator {
 
   void _handleInvalidPermissions(PermissionStatus permission) {
     if (permission == PermissionStatus.denied) {
-      throw PlatformException(
-          code: 'PERMISSION_DENIED',
-          message: 'Access to location data denied',
-          details: null);
+      throw PlatformException(code: 'PERMISSION_DENIED', message: 'Access to location data denied', details: null);
     } else if (permission == PermissionStatus.disabled) {
-      throw PlatformException(
-          code: 'PERMISSION_DISABLED',
-          message: 'Location data is not available on device',
-          details: null);
+      throw PlatformException(code: 'PERMISSION_DISABLED', message: 'Location data is not available on device', details: null);
     }
   }
 
@@ -213,15 +175,13 @@ class Geolocator {
   /// Optionally you can specify a locale in which the results are returned.
   /// When not supplied the currently active locale of the device will be used.
   /// The `localeIdentifier` should be formatted using the syntax: [languageCode]_[countryCode] (eg. en_US or nl_NL).
-  Future<List<Placemark>> placemarkFromAddress(String address,
-      {String localeIdentifier}) async {
+  Future<List<Placemark>> placemarkFromAddress(String address, {String localeIdentifier}) async {
     final Map<String, String> parameters = <String, String>{'address': address};
     if (localeIdentifier != null) {
       parameters['localeIdentifier'] = localeIdentifier;
     }
 
-    final List<dynamic> placemarks =
-        await _methodChannel.invokeMethod('placemarkFromAddress', parameters);
+    final List<dynamic> placemarks = await _methodChannel.invokeMethod('placemarkFromAddress', parameters);
     return Placemark._fromMaps(placemarks);
   }
 
@@ -234,20 +194,14 @@ class Geolocator {
   /// Optionally you can specify a locale in which the results are returned.
   /// When not supplied the currently active locale of the device will be used.
   /// The `localeIdentifier` should be formatted using the syntax: [languageCode]_[countryCode] (eg. en_US or nl_NL).
-  Future<List<Placemark>> placemarkFromCoordinates(
-      double latitude, double longitude,
-      {String localeIdentifier}) async {
-    final Map<String, dynamic> parameters = <String, dynamic>{
-      'latitude': latitude,
-      'longitude': longitude
-    };
+  Future<List<Placemark>> placemarkFromCoordinates(double latitude, double longitude, {String localeIdentifier}) async {
+    final Map<String, dynamic> parameters = <String, dynamic>{'latitude': latitude, 'longitude': longitude};
 
     if (localeIdentifier != null) {
       parameters['localeIdentifier'] = localeIdentifier;
     }
 
-    final List<dynamic> placemarks = await _methodChannel.invokeMethod(
-        'placemarkFromCoordinates', parameters);
+    final List<dynamic> placemarks = await _methodChannel.invokeMethod('placemarkFromCoordinates', parameters);
 
     try {
       return Placemark._fromMaps(placemarks);
@@ -257,12 +211,6 @@ class Geolocator {
   }
 
   /// Returns the distance between the supplied coordinates in meters.
-  Future<double> distanceBetween(double startLatitude, double startLongitude,
-          double endLatitude, double endLongitude) =>
-      _methodChannel.invokeMethod('distanceBetween', <String, double>{
-        'startLatitude': startLatitude,
-        'startLongitude': startLongitude,
-        'endLatitude': endLatitude,
-        'endLongitude': endLongitude
-      }).then<double>((dynamic result) => result);
+  Future<double> distanceBetween(double startLatitude, double startLongitude, double endLatitude, double endLongitude) =>
+      _methodChannel.invokeMethod('distanceBetween', <String, double>{'startLatitude': startLatitude, 'startLongitude': startLongitude, 'endLatitude': endLatitude, 'endLongitude': endLongitude}).then<double>((dynamic result) => result);
 }
